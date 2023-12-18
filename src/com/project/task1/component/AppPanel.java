@@ -15,12 +15,15 @@ public class AppPanel extends JPanel {
     private final int nodeDiameter = 30;
     private final List<Node> nodes = new ArrayList<>();
     private final List<Arc> arcs = new ArrayList<>();
-    Point start = null;
-    Point end = null;
-    boolean isDragging = false;
+    private Point start = null;
+    private Point end = null;
+    private boolean isDragging = false;
+    private final GraphTypeComboBox<String> comboBox = new GraphTypeComboBox<>(new String[]{"directed", "undirected"});
 
     public AppPanel() {
         add(new AdjacencyMatrixButton("Show adjacency matrix"));
+        add(new JLabel("Choose graph type: "));
+        add(comboBox);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         addMouseListener(new MouseAdapter() {
             @Override
@@ -37,6 +40,7 @@ public class AppPanel extends JPanel {
                         writeToFile();
                     }
                 } else {
+                    boolean isDirected = comboBox.isDirected();
                     nodes.stream()
                             .filter(node -> isPointOnNode(start, node))
                             .findFirst()
@@ -45,7 +49,7 @@ public class AppPanel extends JPanel {
                                     .findFirst()
                                     .ifPresent(endNode -> {
                                         updateEnds(startNode, endNode);
-                                        arcs.add(new Arc(start, end));
+                                        arcs.add(new Arc(start, end, isDirected));
                                         FileUtil.updateMatrix(startNode.getValue() - 1, endNode.getValue() - 1);
                                         writeToFile();
                                     }));
