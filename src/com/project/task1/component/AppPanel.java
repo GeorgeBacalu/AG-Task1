@@ -28,7 +28,9 @@ public class AppPanel extends JPanel {
             @Override
             public void mouseReleased(MouseEvent event) {
                 if (!isDragging) {
-                    nodes.add(new Node(event.getX(), event.getY(), nodeNumber++));
+                    if (isNodePositionValid(event)) {
+                        nodes.add(new Node(event.getX(), event.getY(), nodeNumber++));
+                    }
                 } else {
                     arcs.add(new Arc(start, end));
                 }
@@ -45,6 +47,13 @@ public class AppPanel extends JPanel {
                 repaint();
             }
         });
+    }
+
+    private boolean isNodePositionValid(MouseEvent event) {
+        int minDistance = 2 * nodeDiameter;
+        return nodes.stream().noneMatch(node ->
+                event.getX() > node.getX() - minDistance && event.getX() < node.getX() + minDistance &&
+                event.getY() > node.getY() - minDistance && event.getY() < node.getY() + minDistance);
     }
 
     @Override
