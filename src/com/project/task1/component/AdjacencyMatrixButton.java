@@ -4,6 +4,7 @@ import com.project.task1.util.FileUtil;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
 
 public class AdjacencyMatrixButton extends JButton {
@@ -11,8 +12,10 @@ public class AdjacencyMatrixButton extends JButton {
 
     private AdjacencyMatrixButton(String text) {
         super(text);
-        this.setFocusable(false);
+        setFocusable(false);
         this.addActionListener(event -> {
+            setEnabled(false);
+
             JTextArea textArea = new JTextArea();
             textArea.setFont(new Font("Arial", Font.PLAIN, 20));
             textArea.setEditable(false);
@@ -31,11 +34,17 @@ public class AdjacencyMatrixButton extends JButton {
             panel.add(new JScrollPane(textArea));
 
             JFrame frame = new JFrame("Adjacency Matrix");
-            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             frame.setSize(600, 600);
             frame.add(panel);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+            frame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    AdjacencyMatrixButton.this.setEnabled(true);
+                }
+            });
         });
     }
 

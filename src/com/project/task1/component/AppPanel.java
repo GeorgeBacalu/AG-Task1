@@ -37,6 +37,7 @@ public class AppPanel extends JPanel {
                 if (!isDragging) {
                     if (isNodePositionValid(event, null)) {
                         nodes.add(new Node(event.getX(), event.getY(), nodeNumber++));
+                        comboBox.setEnabled(false);
                         FileUtil.addRowColumnAndInitialize();
                         writeToFile();
                     }
@@ -81,7 +82,6 @@ public class AppPanel extends JPanel {
         add(AdjacencyMatrixButton.getInstance("Show adjacency matrix"));
         add(new JLabel("Choose graph type: "));
         add(comboBox);
-        comboBox.setEnabled(nodes.isEmpty());
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
