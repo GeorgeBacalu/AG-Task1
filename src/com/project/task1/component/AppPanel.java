@@ -1,10 +1,12 @@
 package com.project.task1.component;
 
 import com.project.task1.model.*;
+import com.project.task1.util.FileUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,8 @@ public class AppPanel extends JPanel {
                 if (!isDragging) {
                     if (isNodePositionValid(event)) {
                         nodes.add(new Node(event.getX(), event.getY(), nodeNumber++));
+                        FileUtil.addRowColumnAndInitialize();
+                        writeToFile();
                     }
                 } else {
                     nodes.stream()
@@ -41,6 +45,8 @@ public class AppPanel extends JPanel {
                                     .ifPresent(endNode -> {
                                         updateEnds(startNode, endNode);
                                         arcs.add(new Arc(start, end));
+                                        FileUtil.updateMatrix(startNode.getValue() - 1, endNode.getValue() - 1);
+                                        writeToFile();
                                     }));
                 }
                 start = null;
@@ -56,6 +62,14 @@ public class AppPanel extends JPanel {
                 repaint();
             }
         });
+    }
+
+    private void writeToFile() {
+        try {
+            FileUtil.writeToFile();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 
     private boolean isNodePositionValid(MouseEvent event) {
