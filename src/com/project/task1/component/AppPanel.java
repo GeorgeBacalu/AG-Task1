@@ -18,10 +18,10 @@ public class AppPanel extends JPanel {
     private Point start = null;
     private Point end = null;
     private boolean isDragging = false;
-    private final GraphTypeComboBox<String> comboBox = new GraphTypeComboBox<>(new String[]{"directed", "undirected"});
+    private final GraphTypeComboBox comboBox = GraphTypeComboBox.getInstance(new String[]{"directed", "undirected"});
 
     public AppPanel() {
-        add(new AdjacencyMatrixButton("Show adjacency matrix"));
+        add(AdjacencyMatrixButton.getInstance("Show adjacency matrix"));
         add(new JLabel("Choose graph type: "));
         add(comboBox);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));

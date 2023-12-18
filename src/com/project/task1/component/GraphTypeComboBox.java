@@ -3,11 +3,19 @@ package com.project.task1.component;
 import javax.swing.*;
 
 public class GraphTypeComboBox<T> extends JComboBox<T> {
-    private boolean isDirected = false;
+    private static GraphTypeComboBox instance = null;
+    private boolean isDirected;
 
-    public GraphTypeComboBox(T[] items) {
+    private GraphTypeComboBox(T[] items) {
         super(items);
         this.addActionListener(event -> isDirected = this.getSelectedItem() == items[0]);
+    }
+
+    public static <T> GraphTypeComboBox getInstance(T[] items) {
+        if (instance == null) {
+            instance = new GraphTypeComboBox<>(items);
+        }
+        return instance;
     }
 
     public boolean isDirected() {

@@ -7,8 +7,9 @@ import java.awt.*;
 import java.io.IOException;
 
 public class AdjacencyMatrixButton extends JButton {
+    private static AdjacencyMatrixButton instance = null;
 
-    public AdjacencyMatrixButton(String text) {
+    private AdjacencyMatrixButton(String text) {
         super(text);
         this.setFocusable(false);
         this.addActionListener(event -> {
@@ -36,6 +37,13 @@ public class AdjacencyMatrixButton extends JButton {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
+    }
+
+    public static AdjacencyMatrixButton getInstance(String text) {
+        if (instance == null) {
+            instance = new AdjacencyMatrixButton(text);
+        }
+        return instance;
     }
 
     private static void readFromFile(JTextArea textArea) {
