@@ -17,9 +17,11 @@ public class FileUtil {
         adjacencyMatrix.forEach(row -> row.add(0));
     }
 
-    public static void updateMatrix(int row, int column) {
+    public static void updateMatrix(int row, int column, boolean isDirected) {
         adjacencyMatrix.get(row).set(column, 1);
-        adjacencyMatrix.get(column).set(row, 1);
+        if (!isDirected) {
+            adjacencyMatrix.get(column).set(row, 1);
+        }
     }
 
     public static void writeToFile() throws IOException {

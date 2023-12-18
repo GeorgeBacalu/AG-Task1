@@ -38,6 +38,9 @@ public class AppPanel extends JPanel {
                         nodes.add(new Node(event.getX(), event.getY(), nodeNumber++));
                         FileUtil.addRowColumnAndInitialize();
                         writeToFile();
+                        if(nodes.size() == 1) {
+                            comboBox.setEnabled(false);
+                        }
                     }
                 } else {
                     boolean isDirected = comboBox.isDirected();
@@ -45,12 +48,12 @@ public class AppPanel extends JPanel {
                             .filter(node -> isPointOnNode(start, node))
                             .findFirst()
                             .ifPresent(startNode -> nodes.stream()
-                                    .filter(node -> isPointOnNode(end, node) && node != startNode)
+                                    .filter(node -> isPointOnNode(end, node) && (isDirected || node != startNode))
                                     .findFirst()
                                     .ifPresent(endNode -> {
                                         updateEnds(startNode, endNode);
                                         arcs.add(new Arc(start, end, isDirected));
-                                        FileUtil.updateMatrix(startNode.getValue() - 1, endNode.getValue() - 1);
+                                        FileUtil.updateMatrix(startNode.getValue() - 1, endNode.getValue() - 1, isDirected);
                                         writeToFile();
                                     }));
                 }
