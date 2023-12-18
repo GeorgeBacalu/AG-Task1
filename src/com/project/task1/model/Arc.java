@@ -5,13 +5,17 @@ import java.awt.*;
 public class Arc {
     private Point start;
     private Point end;
+    private final Node startNode;
+    private final Node endNode;
     private final boolean isDirected;
     private static final int ARROW_HEAD_LENGTH = 10;
     private static final int ARROW_HEAD_WIDTH = 5;
 
-    public Arc(Point start, Point end, boolean isDirected) {
+    public Arc(Point start, Point end, Node startNode, Node endNode, boolean isDirected) {
         this.start = start;
         this.end = end;
+        this.startNode = startNode;
+        this.endNode = endNode;
         this.isDirected = isDirected;
     }
 
@@ -29,6 +33,14 @@ public class Arc {
 
     public void setEnd(Point end) {
         this.end = end;
+    }
+
+    public Node getStartNode() {
+        return startNode;
+    }
+
+    public Node getEndNode() {
+        return endNode;
     }
 
     public void drawArc(Graphics graphics) {

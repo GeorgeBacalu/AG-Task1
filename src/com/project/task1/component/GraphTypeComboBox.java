@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class GraphTypeComboBox<T> extends JComboBox<T> {
     private static GraphTypeComboBox instance = null;
-    private boolean isDirected;
+    private boolean isDirected = true;
 
     private GraphTypeComboBox(T[] items) {
         super(items);
