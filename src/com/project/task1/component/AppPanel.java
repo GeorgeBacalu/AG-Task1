@@ -20,6 +20,7 @@ public class AppPanel extends JPanel {
     boolean isDragging = false;
 
     public AppPanel() {
+        add(new AdjacencyMatrixButton("Show adjacency matrix"));
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         addMouseListener(new MouseAdapter() {
             @Override
@@ -68,7 +69,7 @@ public class AppPanel extends JPanel {
         try {
             FileUtil.writeToFile();
         } catch (IOException exception) {
-            exception.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error reading from file!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
