@@ -30,12 +30,18 @@ public class AppPanel extends JPanel {
                 if (event.isShiftDown()) {
                     draggedNode = nodes.stream().filter(node -> isPointOnNode(start, node)).findAny().orElse(null);
                 }
+                if (event.isAltDown()) {
+                    nodes.stream().filter(node -> isPointOnNode(start, node)).findAny().ifPresentOrElse(nodeToDelete -> {
+                        arcs.removeIf(arc -> arc.getStartNode().getValue() == nodeToDelete.getValue() || arc.getEndNode().getValue() == nodeToDelete.getValue());
+                        nodes.remove(nodeToDelete);
+                    }, () -> arcs.stream().filter(arc -> isPointNearArc(start, arc)).findAny().ifPresent(arcs::remove));
+                }
             }
 
             @Override
             public void mouseReleased(MouseEvent event) {
                 if (!isDragging) {
-                    if (isNodePositionValid(event, null)) {
+                    if (isNodePositionValid(event, null) && !event.isAltDown()) {
                         nodes.add(new Node(event.getX(), event.getY(), nodeNumber++));
                         graphTypeComboBox.setEnabled(false);
                         FileUtil.addRowColumnAndInitialize();
@@ -93,17 +99,30 @@ public class AppPanel extends JPanel {
         }
     }
 
+    private boolean isPointOnNode(Point point, Node node) {
+        int radius = nodeDiameter / 2, centerX = node.getX() + radius, centerY = node.getY() + radius;
+        int distance = (int) Math.sqrt(Math.pow(point.x - centerX, 2) + Math.pow(point.y - centerY, 2));
+        return distance <= radius;
+    }
+
+    private boolean isPointNearArc(Point point, Arc arc) {
+        if (arc.getStartNode() != arc.getEndNode()) {
+            Point startLine = arc.getStart(), endLine = arc.getEnd();
+            int deltaX = endLine.x - startLine.x, deltaY = endLine.y - startLine.y;
+            double projectionFactor = ((point.x - startLine.x) * deltaX + (point.y - startLine.y) * deltaY) / (Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+            Point closestPoint = projectionFactor < 0 ? startLine : projectionFactor > 1 ? endLine :
+                    new Point(startLine.x + (int) (projectionFactor * deltaX), startLine.y + (int) (projectionFactor * deltaY));
+            return point.distance(closestPoint) < 10;
+        }
+        int centerX = arc.getStart().x + nodeDiameter / 2, centerY = arc.getStart().y + nodeDiameter / 2, loopDiameter = nodeDiameter;
+        return new Rectangle(centerX - loopDiameter / 2, centerY - loopDiameter / 2, loopDiameter, loopDiameter).contains(point);
+    }
+
     private boolean isNodePositionValid(MouseEvent event, Node draggedNode) {
         int minDistance = 2 * nodeDiameter;
         return nodes.stream().filter(node -> node != draggedNode).noneMatch(node ->
                 event.getX() > node.getX() - minDistance && event.getX() < node.getX() + minDistance &&
                 event.getY() > node.getY() - minDistance && event.getY() < node.getY() + minDistance);
-    }
-
-    private boolean isPointOnNode(Point point, Node node) {
-        int radius = nodeDiameter / 2, centerX = node.getX() + radius, centerY = node.getY() + radius;
-        int distance = (int) Math.sqrt(Math.pow(point.x - centerX, 2) + Math.pow(point.y - centerY, 2));
-        return distance <= radius;
     }
 
     private void updateEnds(Node startNode, Node endNode) {
