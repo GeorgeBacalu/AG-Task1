@@ -19,7 +19,7 @@ public class AppPanel extends JPanel {
     private Point end = null;
     private boolean isDragging = false;
     private Node draggedNode = null;
-    private final GraphTypeComboBox comboBox = GraphTypeComboBox.getInstance(new String[]{"directed", "undirected"});
+    private final GraphTypeComboBox graphTypeComboBox = GraphTypeComboBox.getInstance(new String[]{"directed", "undirected"});
 
     public AppPanel() {
         initializeComponents();
@@ -37,12 +37,12 @@ public class AppPanel extends JPanel {
                 if (!isDragging) {
                     if (isNodePositionValid(event, null)) {
                         nodes.add(new Node(event.getX(), event.getY(), nodeNumber++));
-                        comboBox.setEnabled(false);
+                        graphTypeComboBox.setEnabled(false);
                         FileUtil.addRowColumnAndInitialize();
                         writeToFile();
                     }
                 } else {
-                    boolean isDirected = comboBox.isDirected();
+                    boolean isDirected = graphTypeComboBox.isDirected();
                     nodes.stream()
                             .filter(node -> isPointOnNode(start, node))
                             .findFirst()
@@ -51,7 +51,7 @@ public class AppPanel extends JPanel {
                                     .findFirst()
                                     .ifPresent(endNode -> {
                                         updateEnds(startNode, endNode);
-                                        arcs.add(new Arc(start, end, startNode, endNode, isDirected));
+                                        arcs.add(new Arc(start, end, startNode, endNode, isDirected, nodeDiameter));
                                         FileUtil.updateMatrix(startNode.getValue() - 1, endNode.getValue() - 1, isDirected);
                                         writeToFile();
                                     }));
@@ -81,7 +81,7 @@ public class AppPanel extends JPanel {
     private void initializeComponents() {
         add(AdjacencyMatrixButton.getInstance("Show adjacency matrix"));
         add(new JLabel("Choose graph type: "));
-        add(comboBox);
+        add(graphTypeComboBox);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
@@ -89,7 +89,7 @@ public class AppPanel extends JPanel {
         try {
             FileUtil.writeToFile();
         } catch (IOException exception) {
-            JOptionPane.showMessageDialog(null, "Error reading from file!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error writing to file!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

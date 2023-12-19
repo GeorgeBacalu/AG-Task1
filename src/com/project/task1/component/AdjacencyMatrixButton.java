@@ -13,7 +13,7 @@ public class AdjacencyMatrixButton extends JButton {
     private AdjacencyMatrixButton(String text) {
         super(text);
         setFocusable(false);
-        this.addActionListener(event -> {
+        addActionListener(event -> {
             setEnabled(false);
 
             JTextArea textArea = new JTextArea();

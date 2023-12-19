@@ -8,7 +8,7 @@ public class GraphTypeComboBox<T> extends JComboBox<T> {
 
     private GraphTypeComboBox(T[] items) {
         super(items);
-        this.addActionListener(event -> isDirected = this.getSelectedItem() == items[0]);
+        addActionListener(event -> isDirected = this.getSelectedItem() == items[0]);
     }
 
     public static <T> GraphTypeComboBox getInstance(T[] items) {
