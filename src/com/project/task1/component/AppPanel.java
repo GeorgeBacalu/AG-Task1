@@ -20,6 +20,7 @@ public class AppPanel extends JPanel {
     private boolean isDragging = false;
     private Node draggedNode = null;
     private final GraphTypeComboBox graphTypeComboBox = GraphTypeComboBox.getInstance(new String[]{"directed", "undirected"});
+    private boolean isDirected = graphTypeComboBox.isDirected();
 
     public AppPanel() {
         initializeComponents();
@@ -31,10 +32,15 @@ public class AppPanel extends JPanel {
                     draggedNode = nodes.stream().filter(node -> isPointOnNode(start, node)).findAny().orElse(null);
                 }
                 if (event.isAltDown()) {
-                    nodes.stream().filter(node -> isPointOnNode(start, node)).findAny().ifPresentOrElse(nodeToDelete -> {
-                        arcs.removeIf(arc -> arc.getStartNode().getValue() == nodeToDelete.getValue() || arc.getEndNode().getValue() == nodeToDelete.getValue());
-                        nodes.remove(nodeToDelete);
-                    }, () -> arcs.stream().filter(arc -> isPointNearArc(start, arc)).findAny().ifPresent(arcs::remove));
+                    nodes.stream()
+                            .filter(node -> isPointOnNode(start, node))
+                            .findAny()
+                            .ifPresentOrElse(AppPanel.this::deleteNodeAndAdjacentArcs, () -> arcs.stream()
+                                    .filter(arc -> isPointNearArc(start, arc))
+                                    .findAny()
+                                    .ifPresent(AppPanel.this::deleteArc));
+                    writeToFile();
+                    repaint();
                 }
             }
 
@@ -48,7 +54,7 @@ public class AppPanel extends JPanel {
                         writeToFile();
                     }
                 } else {
-                    boolean isDirected = graphTypeComboBox.isDirected();
+                    isDirected = graphTypeComboBox.isDirected();
                     nodes.stream()
                             .filter(node -> isPointOnNode(start, node))
                             .findFirst()
@@ -58,7 +64,7 @@ public class AppPanel extends JPanel {
                                     .ifPresent(endNode -> {
                                         updateEnds(startNode, endNode);
                                         arcs.add(new Arc(start, end, startNode, endNode, isDirected, nodeDiameter));
-                                        FileUtil.updateMatrix(startNode.getValue() - 1, endNode.getValue() - 1, isDirected);
+                                        FileUtil.updateMatrix(startNode.getValue() - 1, endNode.getValue() - 1, isDirected, true);
                                         writeToFile();
                                     }));
                 }
@@ -116,6 +122,19 @@ public class AppPanel extends JPanel {
         }
         int centerX = arc.getStart().x + nodeDiameter / 2, centerY = arc.getStart().y + nodeDiameter / 2, loopDiameter = nodeDiameter;
         return new Rectangle(centerX - loopDiameter / 2, centerY - loopDiameter / 2, loopDiameter, loopDiameter).contains(point);
+    }
+
+    private void deleteNodeAndAdjacentArcs(Node nodeToDelete) {
+        arcs.removeIf(arc -> arc.getStartNode().getValue() == nodeToDelete.getValue() || arc.getEndNode().getValue() == nodeToDelete.getValue());
+        nodes.remove(nodeToDelete);
+        nodes.stream().filter(node -> node.getValue() > nodeToDelete.getValue()).forEach(node -> node.setValue(node.getValue() - 1));
+        --nodeNumber;
+        FileUtil.removeRowColumn(nodeToDelete.getValue() - 1);
+    }
+
+    private void deleteArc(Arc arcToDelete) {
+        arcs.remove(arcToDelete);
+        FileUtil.updateMatrix(arcToDelete.getStartNode().getValue() - 1, arcToDelete.getEndNode().getValue() - 1, isDirected, false);
     }
 
     private boolean isNodePositionValid(MouseEvent event, Node draggedNode) {

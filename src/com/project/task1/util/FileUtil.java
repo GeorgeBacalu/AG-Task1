@@ -17,10 +17,16 @@ public class FileUtil {
         adjacencyMatrix.forEach(row -> row.add(0));
     }
 
-    public static void updateMatrix(int row, int column, boolean isDirected) {
-        adjacencyMatrix.get(row).set(column, 1);
+    public static void removeRowColumn(int index) {
+        adjacencyMatrix.remove(index);
+        adjacencyMatrix.forEach(row -> row.remove(index));
+    }
+
+    public static void updateMatrix(int row, int column, boolean isDirected, boolean arcAdded) {
+        int newValue = arcAdded ? 1 : 0;
+        adjacencyMatrix.get(row).set(column, newValue);
         if (!isDirected) {
-            adjacencyMatrix.get(column).set(row, 1);
+            adjacencyMatrix.get(column).set(row, newValue);
         }
     }
 
